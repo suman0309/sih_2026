@@ -1,0 +1,16 @@
+fastapi
+uvicorn[standard]
+python-multipart
+
+tensorflow
+numpy
+pandas
+pillow
+
+scikit-learn
+
+sqlalchemy
+psycopg2-binary
+
+redis
+python-dotenv
