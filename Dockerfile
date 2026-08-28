@@ -1,22 +1,15 @@
-# Typescript .ts -> js
-
-#multistage build
-
-FROM ubuntu as build
-
-RUN apt-get update
-RUN apt-get install -y curl
-RUN curl -sL https://deb.nodesource.com/setup_18.x | bash -
-RUN apt-get upgrade -y
-RUN apt-get install -y nodejs
-RUN apt-get install typescript
-
-WORKDIR /app     #after this all will be created in a working directory name app
-
-COPY package.json package.json
-COPY package-lock.json package-lock.json
-
+FROM node:20-alpine AS build
+WORKDIR /app
+COPY package*.json ./
 RUN npm install
-RUN tsc -p . # build
+COPY tsconfig.json ./
+COPY src ./src
+RUN npm run build
 
-FROM ubuntu as runner
+FROM node:20-alpine
+WORKDIR /app
+COPY package*.json ./
+RUN npm install --omit=dev
+COPY --from=build /app/dist ./dist
+EXPOSE 3001
+CMD ["npm", "start"]

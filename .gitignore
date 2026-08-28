@@ -32,6 +32,7 @@ Thumbs.db
 
 # Cache
 .cache/
+.npm-cache/
 .parcel-cache/
 .eslintcache
 
@@ -40,3 +41,6 @@ coverage/
 
 # Uploads
 uploads/
+
+# Local YOLO clone — do not commit
+ai-detector/

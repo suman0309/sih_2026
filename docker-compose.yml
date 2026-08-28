@@ -1,12 +1,37 @@
-version: '3.8'
-
 services:
   postgres:
-    image: postgres
-    ports:
-      - "5432:5432"
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: hazard
+      POSTGRES_PASSWORD: hazard
+      POSTGRES_DB: hazards
+    ports: ["5432:5432"]
+    volumes: ["postgres_data:/var/lib/postgresql/data"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U hazard -d hazards"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
   redis:
-    image: redis
-    ports:
-     - "6379:6379"
+    image: redis:7-alpine
+    ports: ["6379:6379"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+  backend:
+    build: .
+    environment:
+      PORT: 3001
+      DATABASE_URL: postgresql://hazard:hazard@postgres:5432/hazards
+      REDIS_URL: redis://redis:6379
+      YOLO_URL: http://host.docker.internal:8000
+      YOLO_API_KEY: sih-demo-key
+    ports: ["3001:3001"]
+    depends_on:
+      postgres: { condition: service_healthy }
+      redis: { condition: service_healthy }
 
+volumes:
+  postgres_data:
